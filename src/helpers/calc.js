@@ -1,67 +1,82 @@
-const customEvaluate = (expression) => {
-  // return expression;
-
-  const tokens = expression.split('');
-
-  // Função auxiliar para verificar se um caractere é um operador
-  function isOperator(char) {
-    return ['+', '-', '*', '/', '%', '^'].includes(char);
+function calculateExpression(expression) {
+  const tokens = expression.match(/(\d+(\.\d+)?)|([+\-*/^()])/g);
+  console.log(tokens);
+  if (!tokens) {
+    throw new Error('Invalid expression');
   }
 
-  // Pilha para armazenar números e operadores
-  const stack = [];
+  const precedence = {
+    '+': 1,
+    '-': 1,
+    '*': 2,
+    '/': 2,
+    '^': 3,
+  };
 
-  // if (!isNaN(token) || token === '.') {
-  //   // Se o token for um número ou um ponto decimal, adiciona ao topo da pilha
-  //   if (stack.length > 0 && !isNaN(stack[stack.length - 1])) {
-  //     // Se o topo da pilha também for um número, concatena os dígitos
-  //     stack[stack.length - 1] += token;
-  //   } else {
-  //     stack.push(token);
-  //   }
-  // } else
-  // Loop através dos tokens
-  let operador = 0;
-  for (let token of tokens) {
-    // console.log(token);
-    if (!isNaN(token) || token === '.') {
-      stack.push(token);
-    } else if (isOperator(token)) {
-      operador = token;
+  const outputQueue = [];
+  const operatorStack = [];
+
+  tokens.forEach((token) => {
+    if (!isNaN(token)) {
+      outputQueue.push(parseFloat(token));
+    } else if ('+-*/^'.includes(token)) {
+      while (
+        operatorStack.length > 0 &&
+        precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]
+      ) {
+        outputQueue.push(operatorStack.pop());
+      }
+      operatorStack.push(token);
+    } else if (token === '(') {
+      operatorStack.push(token);
+    } else if (token === ')') {
+      while (
+        operatorStack.length > 0 &&
+        operatorStack[operatorStack.length - 1] !== '('
+      ) {
+        outputQueue.push(operatorStack.pop());
+      }
+      operatorStack.pop(); // Pop the '('
     }
+  });
 
-    if (stack.length == 2) {
-      let result = 0;
+  while (operatorStack.length > 0) {
+    outputQueue.push(operatorStack.pop());
+  }
 
-      num2 = Number(stack.pop());
-      num1 = Number(stack.pop());
-      switch (operador) {
+  const evalStack = [];
+
+  outputQueue.forEach((token) => {
+    if (!isNaN(token)) {
+      evalStack.push(token);
+    } else {
+      const b = evalStack.pop();
+      const a = evalStack.pop();
+      switch (token) {
         case '+':
-          result = num1 + num2;
+          evalStack.push(a + b);
           break;
         case '-':
-          result = num1 - num2;
+          evalStack.push(a - b);
           break;
         case '*':
-          result = num1 * num2;
+          evalStack.push(a * b);
           break;
         case '/':
-          result = num1 / num2;
-          break;
-        case '%':
-          result = num1 % num2;
+          evalStack.push(a / b);
           break;
         case '^':
-          result = Math.pow(num1, num2);
+          evalStack.push(Math.pow(a, b));
           break;
       }
-
-      stack.push(result);
     }
+  });
 
-    // O resultado final estará no topo da pilha
+  if (evalStack.length !== 1) {
+    throw new Error('Invalid expression');
   }
-  console.log(stack);
-  return parseFloat(stack[0]);
-};
-module.exports = { customEvaluate };
+
+  return evalStack[0];
+}
+
+module.exports = { calculateExpression };

@@ -7,13 +7,13 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { customEvaluate } from '../helpers/calc';
+import { calculateExpression } from '../helpers/calc';
 
 const isOperator = (char) => {
   if (char == '=') {
     return styles.btnTextEqual;
   }
-  return ['+', '-', '*', '/', '%', '^', '()', 'x', '='].includes(char)
+  return ['+', '-', '*', '/', '%', '^', '()', '*', '='].includes(char)
     ? styles.btnTextElement
     : styles.btnText;
 };
@@ -33,12 +33,12 @@ export default function Calculadora() {
     ['AC', 7, 4, 1, '.'],
     ['()', 8, 5, 2, 0],
     ['%', 9, 6, 3, '+/-'],
-    ['/', 'x', '-', '+', '='],
+    ['/', '*', '-', '+', '='],
   ];
 
   const handleButtonPress = (value) => {
     if (value == '=') {
-      setResultado(customEvaluate(expressao));
+      setResultado(calculateExpression(expressao));
     } else {
       if (value == 'AC') {
         setExpressao('');
