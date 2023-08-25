@@ -1,6 +1,5 @@
 function calculateExpression(expression) {
-  const tokens = expression.match(/(\d+(\.\d+)?)|([+\-*/^()])/g);
-  console.log(tokens);
+  const tokens = expression.match(/(\d+(\.\d+)?)|([+\-*/^%()])/g);
   if (!tokens) {
     throw new Error('Invalid expression');
   }
@@ -11,6 +10,7 @@ function calculateExpression(expression) {
     '*': 2,
     '/': 2,
     '^': 3,
+    '%': 3,
   };
 
   const outputQueue = [];
@@ -19,7 +19,7 @@ function calculateExpression(expression) {
   tokens.forEach((token) => {
     if (!isNaN(token)) {
       outputQueue.push(parseFloat(token));
-    } else if ('+-*/^'.includes(token)) {
+    } else if ('+-*/^%'.includes(token)) {
       while (
         operatorStack.length > 0 &&
         precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]
@@ -63,7 +63,14 @@ function calculateExpression(expression) {
           evalStack.push(a * b);
           break;
         case '/':
+          if (b == 0) {
+            alert('Erro! Division by zero');
+            throw new Error('Erro! Division by zero');
+          }
           evalStack.push(a / b);
+          break;
+        case '%':
+          evalStack.push(`${a % b}`);
           break;
         case '^':
           evalStack.push(Math.pow(a, b));
@@ -75,7 +82,7 @@ function calculateExpression(expression) {
   if (evalStack.length !== 1) {
     throw new Error('Invalid expression');
   }
-
+  console.log(evalStack[0]);
   return evalStack[0];
 }
 

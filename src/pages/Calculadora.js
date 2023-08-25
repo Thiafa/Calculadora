@@ -13,7 +13,7 @@ const isOperator = (char) => {
   if (char == '=') {
     return styles.btnTextEqual;
   }
-  return ['+', '-', '*', '/', '%', '^', '()', '*', '='].includes(char)
+  return ['+', '-', '*', '/', '%', '^', '(', ')', '*', '='].includes(char)
     ? styles.btnTextElement
     : styles.btnText;
 };
@@ -28,11 +28,12 @@ export default function Calculadora() {
       return null;
     }
   });
+  const [parentheses, setParentheses] = useState(true);
 
   const elements = [
     ['AC', 7, 4, 1, '.'],
-    ['()', 8, 5, 2, 0],
-    ['%', 9, 6, 3, '+/-'],
+    ['(', 8, 5, 2, 0],
+    [')', 9, 6, 3, '%'],
     ['/', '*', '-', '+', '='],
   ];
 
@@ -42,7 +43,7 @@ export default function Calculadora() {
     } else {
       if (value == 'AC') {
         setExpressao('');
-        setResultado();
+        setResultado('');
         setHistory(expressao && resultado ? `${expressao}=${resultado}` : null);
       } else {
         setExpressao(expressao + value);
